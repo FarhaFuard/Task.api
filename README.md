@@ -1,68 +1,18 @@
 # Task Management API
 
-A simple Task Management REST API built using **Node.js** and **Express.js** to demonstrate a well-structured **Monolithic Architecture**.
+A simple Task Management REST API built using **Node.js, Express.js, and MySQL**.
 
-## Architecture
+This project demonstrates a **layered monolithic architecture** with clear separation between:
 
-The application follows a layered structure:
-
-```text
-Client
-   ↓
-Controller Layer
-   ↓
-Service Layer
-   ↓
-DAO Layer
-   ↓
-Data
-```
-
-### 1. Controller Layer
-
-Located in:
-
-```text
-controllers/
-```
-
-The Controller layer handles HTTP requests and responses.
-
-Example:
-
-* Receiving API requests
-* Reading request parameters
-* Returning HTTP responses
-* Handling HTTP status codes
-
-### 2. Service Layer
-
-Located in:
-
-```text
-services/
-```
-
-The Service layer contains the application's business logic and validation.
-
-For example, it checks that a task has a valid title before creating it.
-
-### 3. DAO Layer
-
-Located in:
-
-```text
-dao/
-```
-
-The DAO (Data Access Object) layer handles data access and storage.
-
-For this prototype, tasks are stored in an in-memory JavaScript array.
+**Controller → Service → DAO → MySQL**
 
 ## Project Structure
 
 ```text
-task-api/
+23.01.2026_monolithic architecture/
+│
+├── config/
+│   └── db.js
 │
 ├── controllers/
 │   └── taskController.js
@@ -74,38 +24,116 @@ task-api/
 │   └── taskDao.js
 │
 ├── app.js
-├── package.json
-├── package-lock.json
+├── .env
 ├── .gitignore
-└── README.md
+├── package.json
+└── package-lock.json
 ```
+
+## Architecture Layers
+
+### Controller Layer
+
+Handles HTTP requests and responses.
+
+* Receives requests from the client.
+* Calls the appropriate service.
+* Sends the response back to the client.
+* Does not contain database logic.
+
+### Service Layer
+
+Contains the application's business logic.
+
+* Validates task data.
+* Processes requests.
+* Communicates with the DAO layer.
+
+### DAO Layer
+
+Handles database operations.
+
+* Executes SQL queries.
+* Retrieves tasks from MySQL.
+* Creates and deletes tasks.
+* Keeps database logic separate from the other layers.
+
+### Database
+
+The application uses **MySQL** to permanently store task data.
 
 ## Technologies Used
 
 * Node.js
 * Express.js
-* JavaScript
-* REST API
+* MySQL
+* MySQL2
+* dotenv
+* Postman
+
+## Database Setup
+
+Create the database:
+
+```sql
+CREATE DATABASE task_db;
+```
+
+Select the database:
+
+```sql
+USE task_db;
+```
+
+Create the tasks table:
+
+```sql
+CREATE TABLE tasks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    completed BOOLEAN DEFAULT FALSE
+);
+```
+
+Optional sample data:
+
+```sql
+INSERT INTO tasks (title, completed)
+VALUES
+('Learn Monolithic Architecture', FALSE),
+('Build Task API', FALSE);
+```
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```text
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=YOUR_MYSQL_PASSWORD
+DB_NAME=task_db
+```
+
+Do not commit the `.env` file to GitHub.
 
 ## Installation
 
-Clone the repository and open the project folder.
-
-Install the required dependencies:
+Clone the repository and install the dependencies:
 
 ```bash
 npm install
 ```
 
-## Running the Application
+## Run the Application
 
-Start the server using:
+Start the server:
 
 ```bash
 node app.js
 ```
 
-The server will run at:
+The API will run at:
 
 ```text
 http://localhost:3000
@@ -113,58 +141,57 @@ http://localhost:3000
 
 ## API Endpoints
 
-| Method | Endpoint     | Description         |
-| ------ | ------------ | ------------------- |
-| GET    | `/tasks`     | Get all tasks       |
-| GET    | `/tasks/:id` | Get a specific task |
-| POST   | `/tasks`     | Create a new task   |
-| DELETE | `/tasks/:id` | Delete a task       |
+| Method | Endpoint     | Description       |
+| ------ | ------------ | ----------------- |
+| GET    | `/tasks`     | Get all tasks     |
+| GET    | `/tasks/:id` | Get a task by ID  |
+| POST   | `/tasks`     | Create a new task |
+| DELETE | `/tasks/:id` | Delete a task     |
 
-## Example: Get All Tasks
+## Example POST Request
 
-```text
-GET http://localhost:3000/tasks
-```
-
-Example response:
-
-```json
-[
-  {
-    "id": 1,
-    "title": "Learn Monolithic Architecture",
-    "completed": false
-  },
-  {
-    "id": 2,
-    "title": "Build Task API",
-    "completed": false
-  }
-]
-```
-
-## Example: Create a Task
+**POST**
 
 ```text
-POST http://localhost:3000/tasks
+http://localhost:3000/tasks
 ```
 
 Request body:
 
 ```json
 {
-  "title": "Study Software Architecture"
+    "title": "Study Software Architecture"
 }
 ```
 
-## Example: Delete a Task
+Example response:
+
+```json
+{
+    "id": 3,
+    "title": "Study Software Architecture",
+    "completed": false
+}
+```
+
+## Example DELETE Request
+
+**DELETE**
 
 ```text
-DELETE http://localhost:3000/tasks/3
+http://localhost:3000/tasks/3
+```
+
+Example response:
+
+```json
+{
+    "message": "Task deleted successfully"
+}
 ```
 
 ## Purpose
 
-This project was developed to demonstrate how a monolithic application can still maintain a clear separation of responsibilities using **Controller, Service, and DAO layers**.
+This project was developed to demonstrate the principles of **monolithic architecture** and separation of responsibilities using Controller, Service, and DAO layers.
 
-The application is deployed and run as a single application, while the internal code is organized into separate layers for better maintainability and structure.
+The application is deployed as a single unit while maintaining clear internal boundaries between its components.
